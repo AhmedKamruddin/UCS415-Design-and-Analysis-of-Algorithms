@@ -4,7 +4,7 @@ using namespace std;
 
 const int n=6;
 
-list<int> noIncomingEdge(int map[n][n], list<int> s)
+list<int> noIncomingEdge(int map[n][n], list<int> s, int visited[])
 {
     
     for(int i=0; i<n; i++)
@@ -12,7 +12,7 @@ list<int> noIncomingEdge(int map[n][n], list<int> s)
         int flag=1;
         for(int j=0; j<n; j++)
         {
-            if(map[j][i]==1 || map[j][i]==-1 || map[j][i]==-2)
+            if(map[j][i]==1 || visited[i]==1)
             {
                 flag=0;
                 break;
@@ -20,19 +20,16 @@ list<int> noIncomingEdge(int map[n][n], list<int> s)
         }
         if(flag)
         {
-            //cout<<i<<" has no incoming edges\n";
-            for(int j=0; j<n; j++)
-                map[j][i]=-2;
-            
+            visited[i]=1;
             s.push_back(i);
         }
     }
     return s;
 }
 
-list<int> topologicalSort(int map[n][n], list<int> s, list<int> l)
+list<int> topologicalSort(int map[n][n], list<int> s, list<int> l, int visited[])
 {
-    s=noIncomingEdge(map, s);
+    s=noIncomingEdge(map, s, visited);
 
     while(!s.empty())
     {
@@ -47,11 +44,10 @@ list<int> topologicalSort(int map[n][n], list<int> s, list<int> l)
         for(int j=0; j<n; j++)
             map[node][j]=0;
         
-        //Remove the node from map
-        for(int i=0; i<n; i++)
-            map[i][node]=-1;
-    
-        s=noIncomingEdge(map, s);
+        //Mark node as visited
+        visited[node]=1;
+
+        s=noIncomingEdge(map, s, visited);
     }    
     return l;
     
@@ -65,11 +61,11 @@ int main()
                    {0, 0, 0, 0, 1, 0},
                    {0, 0, 0, 0, 0, 0},
                    {0, 0, 0, 0, 0, 0}};
-
+    int visited[n]={};
     list<int> l; //Sorted elements
     list<int> s; //Set of all nodes with no incoming edges
     
-    l=topologicalSort(map, s, l);
+    l=topologicalSort(map, s, l, visited);
 
     while(!l.empty())
     {
